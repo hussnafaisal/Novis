@@ -1,0 +1,157 @@
+{
+  "users": [
+    {
+      "id": "usr_1790115646082_e8xk7h",
+      "name": "Saba",
+      "email": "saba@gmail.com",
+      "passwordHash": "$2a$12$HrrHgqgNbYl4l4NJNOkkfO2642VvSzuBygaohwBpRlBunXYdrUDQe",
+      "createdAt": "2026-09-22T22:20:46.082Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "lotus-chrono",
+      "name": "Lotus Chrono",
+      "type": "Men's Leather",
+      "regularPrice": 9999,
+      "salePrice": 7999,
+      "costPrice": 4000,
+      "discount": 20,
+      "images": [
+        "https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "stock": 18,
+      "unitsSold": 42,
+      "longDescription": "A refined chronograph-inspired timepiece pairing a polished case with an authentic leather strap. Designed for everyday luxury and formal evenings.",
+      "features": [
+        "1-Year International Warranty",
+        "30 Days Hassle-free returns",
+        "Premium chronograph styling",
+        "Quartz precision movement"
+      ],
+      "movement": "Japanese Quartz Chronograph",
+      "strap": "Authentic Leather",
+      "waterResistance": "50M",
+      "active": true,
+      "createdAt": "2026-09-22T22:20:46.081Z"
+    },
+    {
+      "id": "solano-shield",
+      "name": "Solano Shield",
+      "type": "Men's Stainless Steel",
+      "regularPrice": 14999,
+      "salePrice": 11999,
+      "costPrice": 5500,
+      "discount": 20,
+      "images": [
+        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "stock": 8,
+      "unitsSold": 72,
+      "longDescription": "A confident steel silhouette with a clean dial and durable bracelet, built for a sharp daily rotation.",
+      "features": [
+        "1-Year International Warranty",
+        "30 Days Hassle-free returns",
+        "316L-style steel bracelet",
+        "Scratch-resistant mineral glass"
+      ],
+      "movement": "Japanese Quartz",
+      "strap": "Stainless Steel",
+      "waterResistance": "50M",
+      "active": true,
+      "createdAt": "2026-09-22T22:20:46.082Z"
+    },
+    {
+      "id": "axre-grace",
+      "name": "Axre Grace",
+      "type": "Women's Stainless Steel",
+      "regularPrice": 17999,
+      "salePrice": 10999,
+      "costPrice": 5000,
+      "discount": 38,
+      "images": [
+        "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1509048191080-d2f4c6a7d3cc?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "stock": 0,
+      "unitsSold": 58,
+      "longDescription": "An elegant women's steel watch balancing a compact case, luminous detailing and a polished bracelet for understated occasion wear.",
+      "features": [
+        "1-Year International Warranty",
+        "30 Days Hassle-free returns",
+        "Elegant compact case",
+        "Comfort-fit steel bracelet"
+      ],
+      "movement": "Japanese Quartz",
+      "strap": "Stainless Steel",
+      "waterResistance": "30M",
+      "active": true,
+      "createdAt": "2026-09-22T22:20:46.084Z"
+    },
+    {
+      "id": "empire-prestige",
+      "name": "Empire 1.0 Prestige",
+      "type": "Couple's Stainless Steel",
+      "regularPrice": 51499,
+      "salePrice": 25999,
+      "costPrice": 12000,
+      "discount": 49,
+      "images": [
+        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1539874754764-5a96559165b0?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "stock": 4,
+      "unitsSold": 23,
+      "longDescription": "A coordinated couple's set created for milestones, gifting and shared occasions, with matching steel profiles and premium presentation.",
+      "features": [
+        "1-Year International Warranty",
+        "30 Days Hassle-free returns",
+        "Matching couple set",
+        "Premium gift-ready presentation"
+      ],
+      "movement": "Japanese Quartz",
+      "strap": "Stainless Steel",
+      "waterResistance": "30M",
+      "active": true,
+      "createdAt": "2026-09-22T22:20:46.085Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "ORD-1790115657584",
+      "invoiceId": "INV-1",
+      "userId": "usr_1790115646082_e8xk7h",
+      "customer": "Hussna Faisal",
+      "email": "hussnafaisal234@gmail.com",
+      "phone": "03080228992",
+      "city": "Faisalabad",
+      "address": "Muzaffar colony street no 26",
+      "total": 11999,
+      "status": "Confirmed",
+      "createdAt": "2026-09-22T22:20:57.584Z",
+      "confirmedAt": "2026-09-22T22:21:23.967Z",
+      "items": [
+        {
+          "watchId": "solano-shield",
+          "quantity": 1,
+          "unitPrice": 11999,
+          "productName": "Solano Shield",
+          "productImage": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=85"
+        }
+      ]
+    }
+  ],
+  "contacts": [],
+  "usage": {
+    "messages": 0,
+    "tokens": 0,
+    "plan": "Premium Admin Workspace",
+    "last7Days": []
+  }
+}

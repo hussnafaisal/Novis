@@ -1,0 +1,3 @@
+import{NextResponse}from"next/server";import{registerCustomer}from"@/lib/auth";import{db}from"@/lib/db";import{z}from"zod";
+const schema=z.object({name:z.string().min(2),email:z.string().email(),password:z.string().min(8)});
+export async function POST(req:Request){const v=schema.safeParse(await req.json());if(!v.success)return NextResponse.json({error:v.error.issues[0].message},{status:400});if(await db.user.findUnique({where:{email:v.data.email}}))return NextResponse.json({error:"An account with that email already exists."},{status:409});const u=await registerCustomer(v.data.name,v.data.email,v.data.password);return NextResponse.json({ok:true,user:{id:u.id,name:u.name,email:u.email}})}
