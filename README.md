@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Sveston Luxury AI Suite
 
 Production-ready Next.js 14 watch e-commerce platform using TypeScript, React, Tailwind CSS and a file-backed JSON store.
@@ -33,3 +34,7 @@ Open `/admin/login`.
 - Invoice viewing for confirmed orders
 
 Runtime data is stored in `data/store.json`.
+=======
+# Novis
+Novis — Full-stack luxury watch e-commerce platform with product management, cart, authentication, orders, invoices, inventory, and admin dashboard.
+>>>>>>> 91e8cde50aa079ed6315d528c5f8608f68de4207
