@@ -30,7 +30,9 @@ export async function createSession(
     .setExpirationTime("7d")
     .sign(secret);
 
-  cookies().set("sveston_session", token, {
+  const cookieStore = await cookies();
+
+  cookieStore.set("sveston_session", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -40,7 +42,8 @@ export async function createSession(
 }
 
 export async function getSession(): Promise<SessionPayload | null> {
-  const token = cookies().get("sveston_session")?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("sveston_session")?.value;
 
   if (!token) {
     return null;
@@ -66,14 +69,11 @@ export async function getSession(): Promise<SessionPayload | null> {
   }
 }
 
-export function clearSession() {
-  cookies().set("sveston_session", "", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    expires: new Date(0),
-  });
+export async function clearSession() {
+  const cookieStore = await cookies();
+
+  cookieStore.delete("sveston_session");
+
 }
 
 export async function loginCustomer(

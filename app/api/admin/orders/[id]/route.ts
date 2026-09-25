@@ -12,14 +12,15 @@ const nextStatus: Record<Status, Status | null> = {
   Return: null,
 };
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   if (!await requireRole("ADMIN")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   let body: any;
   try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid request." }, { status: 400 }); }
   const status = body.status as Status;
   if (!statuses.includes(status)) return NextResponse.json({ error: "Invalid status." }, { status: 400 });
 
-  const existing: any = await db.order.findUnique({ where: { id: params.id } });
+  const existing: any = await db.order.findUnique({ where: { id: id } });
   if (!existing) return NextResponse.json({ error: "Order not found." }, { status: 404 });
   const current = (existing.status || "Pending") as Status;
   if (current === status) return NextResponse.json(existing);
@@ -38,6 +39,6 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   if (status === "Delivered") data.deliveredAt = new Date().toISOString();
   if (status === "Return") data.returnedAt = new Date().toISOString();
 
-  const order = await db.order.update({ where: { id: params.id }, data });
+  const order = await db.order.update({ where: { id: id }, data });
   return NextResponse.json(order);
 }

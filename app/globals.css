@@ -411,3 +411,361 @@ input:focus,textarea:focus,select:focus{
   .section-heading h2{letter-spacing:-.02em}
   .hero h1,.collection-hero h1{letter-spacing:-.035em}
 }
+
+/* =========================================================
+   FINAL NOVIS THEME OVERRIDE
+   DARK = complete black + gold
+   LIGHT = complete light + gold
+   CSS ONLY — functionality unchanged
+   ========================================================= */
+
+/* ---------- DARK: COMPLETE BLACK DEFAULT ---------- */
+:root,
+[data-theme="dark"] {
+  --black: #070707;
+  --black-2: #0D0D0D;
+  --black-3: #151515;
+  --gold: #C9A24D;
+  --gold-light: #E3C477;
+  --gold-soft: #9B702B;
+  --cream: #F4EFE5;
+  --muted: #A39B8E;
+  --line: rgba(201,162,77,.25);
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: #070707;
+  color: #F4EFE5;
+}
+
+[data-theme="dark"] body {
+  background: #070707 !important;
+  color: #F4EFE5 !important;
+}
+
+[data-theme="dark"] .topbar,
+[data-theme="dark"] .site-header,
+[data-theme="dark"] .mobile-nav,
+[data-theme="dark"] .hero,
+[data-theme="dark"] .section-shell,
+[data-theme="dark"] .section-dark,
+[data-theme="dark"] .brand-section,
+[data-theme="dark"] .testimonial-section,
+[data-theme="dark"] .advisor-section,
+[data-theme="dark"] .page-shell,
+[data-theme="dark"] .collection-page,
+[data-theme="dark"] .collection-hero,
+[data-theme="dark"] .site-footer,
+[data-theme="dark"] .my {
+  background-color: #070707;
+}
+
+[data-theme="dark"] .site-header {
+  background: rgba(7,7,7,.96) !important;
+}
+
+[data-theme="dark"] .mobile-nav {
+  background: #090909 !important;
+}
+
+[data-theme="dark"] .hero {
+  background:
+    radial-gradient(circle at 76% 45%, rgba(201,162,77,.12), transparent 34%),
+    linear-gradient(110deg, #070707 0%, #090909 54%, #0D0B08 100%) !important;
+}
+
+[data-theme="dark"] .hero::after {
+  background: linear-gradient(90deg, rgba(7,7,7,.94), transparent 64%) !important;
+}
+
+[data-theme="dark"] .section-dark,
+[data-theme="dark"] .brand-section,
+[data-theme="dark"] .advisor-section {
+  background: #070707 !important;
+  border-top-color: rgba(201,162,77,.10) !important;
+  border-bottom-color: rgba(201,162,77,.10) !important;
+}
+
+[data-theme="dark"] .testimonial-section {
+  background: #070707 !important;
+}
+
+/* The previously cream assurance bar is black in dark mode. */
+[data-theme="dark"] .assurance-strip {
+  background: #0B0B0B !important;
+  color: #E8DFCF !important;
+  border: 1px solid rgba(201,162,77,.18);
+  box-shadow: 0 14px 40px rgba(0,0,0,.45);
+}
+
+[data-theme="dark"] .assurance-strip > div {
+  border-right-color: rgba(201,162,77,.14) !important;
+}
+
+[data-theme="dark"] .assurance-strip strong {
+  color: #E8DFCF;
+}
+
+[data-theme="dark"] .assurance-strip span {
+  color: #81796D;
+}
+
+[data-theme="dark"] .assurance-strip svg {
+  color: #C9A24D;
+}
+
+[data-theme="dark"] .category-card,
+[data-theme="dark"] .product-card,
+[data-theme="dark"] .promo,
+[data-theme="dark"] .review,
+[data-theme="dark"] .loading-card,
+[data-theme="dark"] .account-card,
+[data-theme="dark"] .panel,
+[data-theme="dark"] .craft-image,
+[data-theme="dark"] .product-media {
+  background: #0D0D0D !important;
+  border-color: rgba(201,162,77,.14);
+}
+
+[data-theme="dark"] .brand-grid {
+  background: #0B0B0B !important;
+  border-color: rgba(201,162,77,.18) !important;
+}
+
+[data-theme="dark"] .brand-grid > div {
+  border-color: rgba(201,162,77,.14) !important;
+}
+
+[data-theme="dark"] .review {
+  background: #0D0D0D !important;
+}
+
+[data-theme="dark"] .advisor-section .panel {
+  background: #050505 !important;
+}
+
+[data-theme="dark"] .footer-main,
+[data-theme="dark"] .footer-bottom {
+  background: transparent;
+}
+
+[data-theme="dark"] .collection-hero {
+  background:
+    radial-gradient(circle at 50% 15%, rgba(201,162,77,.12), transparent 38%),
+    linear-gradient(180deg,#090909,#070707) !important;
+}
+
+[data-theme="dark"] .collection-grid .product-card {
+  background: #0D0D0D !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background: #090909 !important;
+  color: #EEE7DA !important;
+  border-color: rgba(201,162,77,.24) !important;
+}
+
+[data-theme="dark"] .gold-button {
+  background: linear-gradient(135deg,#E4C57F 0%,#C9A24D 48%,#9E722B 100%);
+  color: #090806;
+}
+
+[data-theme="dark"] .outline-button,
+[data-theme="dark"] .dark-button {
+  background: #0A0A0A;
+  color: #E7DDCB;
+  border-color: rgba(201,162,77,.45);
+}
+
+[data-theme="dark"] .theme-toggle {
+  background: rgba(201,162,77,.035);
+  color: #E3C477;
+  border-color: rgba(201,162,77,.42);
+}
+
+/* ---------- LIGHT: COMPLETE LIGHT + GOLD ---------- */
+[data-theme="light"] {
+  --black: #F8F6F1;
+  --black-2: #FFFFFF;
+  --black-3: #EEE9DE;
+  --gold: #B8872F;
+  --gold-light: #9A6B20;
+  --gold-soft: #7C551A;
+  --cream: #201D18;
+  --muted: #70695F;
+  --line: rgba(155,112,43,.25);
+  color-scheme: light;
+}
+
+[data-theme="light"] html,
+[data-theme="light"] body {
+  background: #F8F6F1 !important;
+  color: #201D18 !important;
+}
+
+[data-theme="light"] .topbar {
+  background: #211B12 !important;
+  color: #E8D4A7 !important;
+}
+
+[data-theme="light"] .site-header {
+  background: rgba(255,255,255,.95) !important;
+}
+
+[data-theme="light"] .mobile-nav,
+[data-theme="light"] .page-shell,
+[data-theme="light"] .collection-page {
+  background: #F8F6F1 !important;
+}
+
+[data-theme="light"] .hero {
+  background:
+    radial-gradient(circle at 76% 42%,rgba(184,135,47,.14),transparent 34%),
+    linear-gradient(110deg,#F3EEE4 0%,#FFFFFF 54%,#EEE6D7 100%) !important;
+}
+
+[data-theme="light"] .section-dark,
+[data-theme="light"] .brand-section,
+[data-theme="light"] .advisor-section,
+[data-theme="light"] .testimonial-section {
+  background: #F0EBE1 !important;
+  border-top-color: rgba(155,112,43,.13) !important;
+  border-bottom-color: rgba(155,112,43,.13) !important;
+}
+
+[data-theme="light"] .assurance-strip {
+  background: linear-gradient(135deg,#F3E7CB,#E9D5A5) !important;
+  color: #211A0F !important;
+  border-color: rgba(104,74,24,.18);
+}
+
+[data-theme="light"] .assurance-strip > div {
+  border-right-color: rgba(104,74,24,.18) !important;
+}
+
+[data-theme="light"] .category-card,
+[data-theme="light"] .product-card,
+[data-theme="light"] .promo,
+[data-theme="light"] .review,
+[data-theme="light"] .loading-card,
+[data-theme="light"] .account-card,
+[data-theme="light"] .panel,
+[data-theme="light"] .brand-grid {
+  background: #FFFFFF !important;
+  border-color: rgba(155,112,43,.20) !important;
+}
+
+[data-theme="light"] .brand-grid > div {
+  border-color: rgba(155,112,43,.20) !important;
+}
+
+[data-theme="light"] .product-media {
+  background: #EFE9DE !important;
+}
+
+[data-theme="light"] .advisor-section .panel {
+  background: #FFFFFF !important;
+}
+
+[data-theme="light"] .site-footer {
+  background: #211B12 !important;
+}
+
+[data-theme="light"] .collection-hero {
+  background:
+    radial-gradient(circle at 50% 15%,rgba(184,135,47,.16),transparent 38%),
+    linear-gradient(180deg,#FFFFFF,#F2ECE1) !important;
+}
+
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  background: #FFFFFF !important;
+  color: #252119 !important;
+  border-color: rgba(155,112,43,.25) !important;
+}
+
+[data-theme="light"] .gold-button {
+  background: linear-gradient(135deg,#D8B76D 0%,#B8872F 52%,#8B611F 100%);
+  color: #FFFDF7;
+}
+
+[data-theme="light"] .outline-button,
+[data-theme="light"] .dark-button {
+  background: #FFFFFF !important;
+  color: #76521A !important;
+  border-color: rgba(155,112,43,.45) !important;
+}
+
+[data-theme="light"] .theme-toggle {
+  background: rgba(184,135,47,.035);
+  color: #9A6B20;
+  border-color: rgba(168,117,37,.55);
+}
+
+/* Keep gold accents in both modes. */
+[data-theme="dark"] .eyebrow,
+[data-theme="dark"] .hero h1 span,
+[data-theme="dark"] .craft-copy h2 span,
+[data-theme="dark"] .category-card span,
+[data-theme="dark"] .promo span,
+[data-theme="dark"] .text-link,
+[data-theme="dark"] .promo p,
+[data-theme="dark"] .rating span,
+[data-theme="dark"] .theme-toggle,
+[data-theme="dark"] .brand-mark,
+[data-theme="dark"] .hero-badge svg {
+  color: #E3C477;
+}
+
+[data-theme="light"] .eyebrow,
+[data-theme="light"] .hero h1 span,
+[data-theme="light"] .craft-copy h2 span,
+[data-theme="light"] .category-card span,
+[data-theme="light"] .promo span,
+[data-theme="light"] .text-link,
+[data-theme="light"] .promo p,
+[data-theme="light"] .rating span,
+[data-theme="light"] .theme-toggle,
+[data-theme="light"] .brand-mark,
+[data-theme="light"] .hero-badge svg {
+  color: #A87525;
+}
+
+/* Admin follows the selected theme instead of forcing black/white. */
+[data-theme="dark"] .admin-shell .bg-\[\#0c0c0c\],
+[data-theme="dark"] .admin-shell .bg-\[\#0a0a0a\],
+[data-theme="dark"] .admin-shell .bg-\[\#0b0b0b\],
+[data-theme="dark"] .admin-shell .bg-\[\#0d0d0d\],
+[data-theme="dark"] .admin-shell .bg-black {
+  background: #0C0C0C !important;
+  color: #F4EFE5 !important;
+}
+
+[data-theme="dark"] .admin-shell .text-white {
+  color: #F5F0E7 !important;
+}
+
+[data-theme="light"] .admin-shell .bg-\[\#0c0c0c\],
+[data-theme="light"] .admin-shell .bg-\[\#0a0a0a\],
+[data-theme="light"] .admin-shell .bg-\[\#0b0b0b\],
+[data-theme="light"] .admin-shell .bg-\[\#0d0d0d\],
+[data-theme="light"] .admin-shell .bg-black {
+  background: #FFFFFF !important;
+  color: #211E19 !important;
+}
+
+[data-theme="light"] .admin-shell .text-white {
+  color: #211E19 !important;
+}
+
+/* Prevent accidental horizontal overflow on small screens. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
