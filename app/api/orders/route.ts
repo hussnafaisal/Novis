@@ -22,8 +22,10 @@ export async function POST(req:Request){
       total+=p.salePrice*i.quantity;
       items.push({watchId:p.id,quantity:i.quantity,unitPrice:p.salePrice,productName:p.name,productImage:p.images?.[0]||""});
     }
+    const delivery = total >= 10000 ? 0 : 250;
+    const orderTotal = total + delivery;
     const id=`ORD-${Date.now()}`;
-    const order=await db.order.create({data:{id,invoiceId:null,userId:session.sub,customer:v.data.customer.name,email:v.data.customer.email,phone:v.data.customer.phone,city:v.data.customer.city,address:v.data.customer.address,total,status:"Pending",createdAt:new Date().toISOString(),confirmedAt:null,items}});
+    const order=await db.order.create({data:{id,invoiceId:null,userId:session.sub,customer:v.data.customer.name,email:v.data.customer.email,phone:v.data.customer.phone,city:v.data.customer.city,address:v.data.customer.address,total:orderTotal,status:"Pending",createdAt:new Date().toISOString(),confirmedAt:null,items}});
     for(const i of items){const p:any=await db.product.findUnique({where:{id:i.watchId}});if(p)await db.product.update({where:{id:p.id},data:{stock:p.stock-i.quantity,unitsSold:p.unitsSold+i.quantity}});}
     return NextResponse.json({ok:true,id:order.id});
   }catch(e:any){return NextResponse.json({error:e.message||"Order failed."},{status:409});}

@@ -1,3 +1,12 @@
 "use client";
-import{Eye,ShoppingBag}from"lucide-react";import{useStore}from"./StoreProvider";import{money}from"@/lib/format";
-export default function ProductCard({p}:{p:any}){const{openProduct,add}=useStore();return <article className="panel overflow-hidden rounded-2xl"><div className="group relative aspect-[4/5] overflow-hidden"><img src={p.images[0]} alt={p.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-105"/><span className="absolute left-3 top-3 rounded-full bg-black/80 px-3 py-1 text-xs text-amber-400">{p.discount}% OFF</span><div className="absolute inset-x-3 bottom-3 flex gap-2"><button onClick={()=>openProduct(p)} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-black/90 py-3 text-xs text-amber-400"><Eye size={15}/>Quick View</button><button disabled={!p.stock} onClick={()=>add(p.id)} className="rounded-xl bg-amber-500 px-4 text-black"><ShoppingBag size={16}/></button></div></div><div className="p-4"><p className="text-xs uppercase tracking-wider text-zinc-500">{p.type}</p><h3 className="luxury mt-1 text-xl">{p.name}</h3><p className="finance mt-3 font-bold text-amber-400">{money(p.salePrice)} <del className="ml-1 text-xs font-normal text-zinc-600">{money(p.regularPrice)}</del></p><p className={`mt-2 text-xs ${p.stock?"text-emerald-400":"text-red-400"}`}>{p.stock?`${p.stock} available`:"Sold out"}</p></div></article>}
+import { Eye, Heart, ShoppingBag } from "lucide-react";
+import { useStore } from "./StoreProvider";
+import { money } from "@/lib/format";
+
+export default function ProductCard({ p }: { p: any }) {
+  const { openProduct, add } = useStore();
+  return <article className="product-card">
+    <div className="product-media"><img src={p.images[0]} alt={p.name}/><span className="sale-badge">-{p.discount}%</span><button className="wishlist" aria-label={`Save ${p.name}`}><Heart size={16}/></button><div className="product-actions"><button onClick={() => openProduct(p)}><Eye size={15}/> Quick View</button><button disabled={!p.stock} onClick={() => add(p.id)} aria-label="Add to cart"><ShoppingBag size={16}/></button></div></div>
+    <div className="product-info"><p>{p.type}</p><h3>{p.name}</h3><div className="price-row"><strong>{money(p.salePrice)}</strong>{p.regularPrice > p.salePrice && <del>{money(p.regularPrice)}</del>}</div><div className="rating"><span>★★★★★</span><small>{p.unitsSold + 18} reviews</small></div></div>
+  </article>;
+}

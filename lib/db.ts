@@ -38,6 +38,8 @@ async function readStore(): Promise<Store> {
     ...o,
     invoiceId: o.invoiceId ?? (o.status !== "Pending" ? `INV-${String(o.id).replace(/^ORD-/, "")}` : null),
     confirmedAt: o.confirmedAt ?? null,
+    deliveredAt: o.deliveredAt ?? null,
+    returnedAt: o.returnedAt ?? null,
     items: (o.items || []).map((item:any) => ({
       ...item,
       unitPrice: Number(item.unitPrice ?? 0),
@@ -94,6 +96,15 @@ export const db = {
       store.products[index] = { ...store.products[index], ...data }; await writeStore(store); return store.products[index];
     }
   },
+  contact: {
+    async create({ data }: { data: ContactMessage }) {
+      const store = await readStore();
+      store.contacts.push(data);
+      await writeStore(store);
+      return data;
+    },
+    async findMany() { const store = await readStore(); return [...store.contacts].reverse(); }
+  },
   order: {
     async findMany({ orderBy }: { include?: unknown; orderBy?: { createdAt?: "asc"|"desc" } } = {}) {
       const store = await readStore();
@@ -112,8 +123,19 @@ export const db = {
     const last7Days = Array.from({ length: 7 }, (_, index) => {
       const start = new Date(now - (6 - index) * 86400000); start.setHours(0,0,0,0);
       const end = new Date(start); end.setDate(end.getDate() + 1);
-      return store.orders.filter(o => { const t = new Date(o.createdAt).getTime(); return t >= start.getTime() && t < end.getTime(); }).length;
+      return Number(store.usage.last7Days?.[index] || 0);
     });
-    return { messages: 0, tokens: 0, plan: "Premium Admin Workspace", last7Days };
+    return { messages: Number(store.usage.messages || 0), tokens: Number(store.usage.tokens || 0), plan: store.usage.plan || "Premium Admin Workspace", last7Days };
+  },
+  async recordChat(tokens: number) {
+    const store = await readStore();
+    const day = new Date().getDay();
+    const index = (day + 6) % 7;
+    const days = Array.from({ length: 7 }, (_, i) => Number(store.usage.last7Days?.[i] || 0));
+    days[index] = Number(days[index] || 0) + 1;
+    store.usage.messages = Number(store.usage.messages || 0) + 1;
+    store.usage.tokens = Number(store.usage.tokens || 0) + Math.max(0, Math.floor(tokens));
+    store.usage.last7Days = days;
+    await writeStore(store);
   }
 };

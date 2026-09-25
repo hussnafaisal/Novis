@@ -1,7 +1,39 @@
 "use client";
-import Link from "next/link";import{Menu,ShoppingBag,X}from"lucide-react";import{useState}from"react";import{useStore}from"./StoreProvider";
-export default function Header(){const[o,setO]=useState(false);const{cart}=useStore();const n=cart.reduce((a,b)=>a+b.quantity,0);return <header className="sticky top-0 z-50 border-b border-amber-500/20 bg-black/90 backdrop-blur"><div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4"><Link href="/" className="flex items-center gap-3"><img
-  src="./logo.svg"
-  alt="Novis Luxury AI Suite"
-  className="h-10 w-auto object-contain"
-/><span className="luxury text-lg tracking-[.22em] text-amber-400">Novis</span></Link><nav className="hidden gap-7 md:flex">{["Collections","Latest Products","About Us","Contact Us"].map((x,i)=><Link key={x} href={i<2?`/#${i?"latest":"collections"}`:`/${x==="About Us"?"about":"contact"}`} className="text-sm text-zinc-300 hover:text-amber-400">{x}</Link>)}</nav><div className="flex items-center gap-2"><Link href="/auth/sign-in" className="hidden text-sm text-zinc-400 hover:text-amber-400 sm:block">Account</Link><Link href="/cart" className="relative rounded-xl p-2 text-zinc-300"><ShoppingBag size={20}/>{n>0&&<b className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-amber-500 px-1 text-[10px] text-black">{n}</b>}</Link><button className="md:hidden" onClick={()=>setO(!o)}>{o?<X/>:<Menu/>}</button></div></div>{o&&<nav className="border-t border-amber-500/10 bg-black p-4 md:hidden">{["/#collections","/#latest","/about","/contact","/auth/sign-in"].map((h,i)=><Link key={h} onClick={()=>setO(false)} href={h} className="block py-3 text-zinc-300">{["Collections","Latest Products","About Us","Contact Us","Account"][i]}</Link>)}</nav>}</header>}
+
+import Link from "next/link";
+import { Menu, Search, ShoppingBag, UserRound, X } from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
+import { useEffect, useState } from "react";
+import { useStore } from "./StoreProvider";
+
+export default function Header() {
+  const [open, setOpen] = useState(false);
+  const [customer, setCustomer] = useState<{name:string}|null>(null);
+  const { cart } = useStore();
+  const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  useEffect(() => {
+    fetch("/api/auth/me").then(r => r.ok ? r.json() : null).then(d => setCustomer(d?.user || null)).catch(() => {});
+  }, []);
+
+  const nav = [
+    ["Home", "/"], ["Collections", "/collections"], ["New Arrivals", "/#latest"], ["About", "/about"], ["Contact", "/contact"],
+  ];
+
+  return <>
+    <div className="topbar"><div>FREE SHIPPING ON ORDERS OVER RS. 10,000</div><div className="hidden sm:block">1-YEAR INTERNATIONAL WARRANTY</div><div className="hidden md:block">30-DAY EASY RETURNS</div></div>
+    <header className="site-header">
+      <div className="header-inner">
+        <button className="mobile-menu md:hidden" onClick={() => setOpen(v => !v)} aria-label="Open menu">{open ? <X size={20}/> : <Menu size={20}/>}</button>
+        <Link href="/" className="brand" onClick={() => setOpen(false)}><span className="brand-mark">N</span><span><strong>NOVIS</strong><small>TIMEPIECES</small></span></Link>
+        <nav className="desktop-nav">{nav.map(([label, href]) => <Link key={label} href={href}>{label}</Link>)}</nav>
+        <div className="header-actions">
+          <button className="icon-btn hidden sm:inline-flex" aria-label="Search"><Search size={18}/></button><ThemeToggle />
+          <Link href={customer ? "/account" : "/auth/sign-in"} className="icon-btn" aria-label="Account"><UserRound size={18}/></Link>
+          <Link href="/cart" className="icon-btn cart-icon" aria-label="Shopping bag"><ShoppingBag size={18}/>{count > 0 && <span>{count}</span>}</Link>
+        </div>
+      </div>
+      {open && <nav className="mobile-nav md:hidden">{nav.map(([label, href]) => <Link key={label} href={href} onClick={() => setOpen(false)}>{label}</Link>)}<Link href={customer ? "/account" : "/auth/sign-in"} onClick={() => setOpen(false)}>{customer ? customer.name : "Account"}</Link></nav>}
+    </header>
+  </>;
+}

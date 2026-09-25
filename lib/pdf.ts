@@ -201,3 +201,84 @@ ${xref}
   return Buffer.from(pdf, "latin1");
 }
 
+
+export function catalogPdf(products: any[]) {
+  const PAGE_W = 595;
+  const PAGE_H = 842;
+  const margin = 42;
+  const cardW = 245;
+  const cardH = 170;
+  const gap = 20;
+  const pages: string[][] = [];
+
+  let page: string[] = [];
+  let y = 790;
+  let index = 0;
+  const add = (line: string) => page.push(line);
+  const newPage = () => { if (page.length) pages.push(page); page = []; y = 790; };
+  const esc2 = (s: string) => esc(String(s));
+  const text2 = (x: number, yy: number, t: string, size = 10, bold = false, color = "0.95 0.91 0.84") => {
+    add(`${color} rg BT /${bold ? "F2" : "F1"} ${size} Tf ${x} ${yy} Td (${esc2(t)}) Tj ET`);
+  };
+  const line2 = (x1:number, yy:number, x2:number) => add(`0.72 0.52 0.22 RG 0.7 w ${x1} ${yy} m ${x2} ${yy} l S`);
+
+  products.forEach((p, i) => {
+    if (i % 4 === 0) {
+      if (i) newPage();
+      add("0.035 0.035 0.035 rg 0 0 595 842 re f");
+      text2(42, 805, "NOVIS", 23, true, "0.82 0.62 0.29");
+      text2(42, 782, "TIMEPIECES  /  COMPLETE COLLECTION", 8, false, "0.58 0.55 0.50");
+      line2(42, 765, 553);
+      y = 730;
+    }
+    const pos = i % 4;
+    const col = pos % 2;
+    const row = Math.floor(pos / 2);
+    const x = margin + col * (cardW + gap);
+    const top = y - row * (cardH + 20);
+    const bottom = top - cardH;
+    add(`0.065 0.065 0.065 rg ${x} ${bottom} ${cardW} ${cardH} re f`);
+    add(`0.50 0.36 0.15 RG 0.6 w ${x} ${bottom} ${cardW} ${cardH} re S`);
+    text2(x + 14, top - 25, String(p.type || "TIMEPIECE").toUpperCase().slice(0, 34), 7, false, "0.62 0.47 0.26");
+    text2(x + 14, top - 52, String(p.name).slice(0, 34), 17, true);
+    text2(x + 14, top - 73, `Rs. ${Number(p.salePrice || 0).toLocaleString("en-PK")}`, 11, true, "0.88 0.69 0.36");
+    if (p.regularPrice && Number(p.regularPrice) > Number(p.salePrice)) text2(x + 100, top - 73, `Rs. ${Number(p.regularPrice).toLocaleString("en-PK")}`, 8, false, "0.40 0.39 0.36");
+    text2(x + 14, top - 98, `Movement: ${String(p.movement || "—").slice(0, 28)}`, 8, false, "0.67 0.65 0.61");
+    text2(x + 14, top - 116, `Strap: ${String(p.strap || "—")}`, 8, false, "0.67 0.65 0.61");
+    text2(x + 14, top - 134, `Water resistance: ${String(p.waterResistance || "—")}`, 8, false, "0.67 0.65 0.61");
+    text2(x + 14, top - 153, `Stock: ${Number(p.stock || 0) > 0 ? "Available" : "Sold out"}`, 7, true, Number(p.stock || 0) > 0 ? "0.70 0.73 0.65" : "0.58 0.40 0.38");
+    index = i;
+  });
+  newPage();
+
+  pages.forEach((lines, pi) => {
+    lines.push(`0.35 0.35 0.35 rg BT /F1 7 Tf 42 25 Td (NOVIS TIMEPIECES  •  PAGE ${pi + 1}  •  novis) Tj ET`);
+  });
+
+  const objects: string[] = [
+    `<< /Type /Catalog /Pages 2 0 R >>`,
+    `<< /Type /Pages /Kids [${pages.map((_, i) => `${3 + i * 2} 0 R`).join(" ")}] /Count ${pages.length} >>`,
+  ];
+  const pageIds: number[] = [];
+  let objId = 3;
+  for (const lines of pages) {
+    const stream = lines.join("\n");
+    const pageId = objId;
+    const contentId = objId + 1;
+    pageIds.push(pageId);
+    objects.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PAGE_W} ${PAGE_H}] /Resources << /Font << /F1 ${3 + pages.length * 2} 0 R /F2 ${4 + pages.length * 2} 0 R >> >> /Contents ${contentId} 0 R >>`);
+    objects.push(`<< /Length ${Buffer.byteLength(stream, "latin1")} >>\nstream\n${stream}\nendstream`);
+    objId += 2;
+  }
+  objects.push(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>`);
+  objects.push(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>`);
+
+  let pdf = "%PDF-1.4\n";
+  const offsets: number[] = [0];
+  objects.forEach((obj, i) => { offsets.push(Buffer.byteLength(pdf, "latin1")); pdf += `${i + 1} 0 obj\n${obj}\nendobj\n`; });
+  const xref = Buffer.byteLength(pdf, "latin1");
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  for (let i = 1; i < offsets.length; i++) pdf += `${String(offsets[i]).padStart(10, "0")} 00000 n \n`;
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+  return Buffer.from(pdf, "latin1");
+}

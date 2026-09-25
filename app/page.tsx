@@ -1,12 +1,67 @@
-import {db} from "@/lib/db";import{parseProduct}from"@/lib/format";import ProductCard from"@/components/ProductCard";import QuickView from"@/components/QuickView";import AIAdvisor from"@/components/AIAdvisor";import Link from"next/link";import Footer from"@/components/Footer";
-export default async function Home(){const products=(await db.product.findMany({where:{active:true},orderBy:{createdAt:"asc"}})).map(parseProduct);const latest=[...products].reverse();return <main>
-<section className="relative overflow-hidden border-b border-amber-500/10"><div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_25%,rgba(245,158,11,.16),transparent_35%)]"/><div className="relative mx-auto grid min-h-[680px] max-w-7xl items-center gap-12 px-4 py-20 lg:grid-cols-2"><div><p className="text-xs uppercase tracking-[.35em] text-amber-500">Sveston Luxury AI Suite</p><h1 className="luxury mt-5 text-6xl leading-tight sm:text-7xl">Time,<br/><span className="text-amber-400">refined.</span></h1><p className="mt-6 max-w-xl text-lg leading-8 text-zinc-400">Discover signature watches with premium details, transparent pricing and a seamless shopping journey.</p><div className="mt-8 flex flex-wrap gap-3"><Link href="#collections" className="rounded-xl bg-amber-500 px-6 py-3 font-bold text-black">Explore Collection</Link><Link href="#latest" className="rounded-xl border border-amber-500/30 px-6 py-3 text-amber-400">View Latest</Link></div></div><div className="mx-auto w-full max-w-lg"><div className="aspect-square rounded-[2rem] border border-amber-500/20 p-4 shadow-[0_0_70px_rgba(245,158,11,.08)]"><img src={products[0]?.images[0]} alt={products[0]?.name||"Luxury timepiece"} className="h-full w-full rounded-[1.5rem] object-cover"/></div></div></div></section>
-<section className="border-b border-white/5 bg-[#080808]"><div className="mx-auto grid max-w-7xl gap-5 px-4 py-8 text-center sm:grid-cols-3"><div><b className="text-amber-400">18 Million</b><p className="mt-1 text-xs text-zinc-500">Satisfied Customers</p></div><div><b className="text-amber-400">Easy Refund</b><p className="mt-1 text-xs text-zinc-500">Exchange support</p></div><div><b className="text-amber-400">1-Year</b><p className="mt-1 text-xs text-zinc-500">International Warranty</p></div></div></section>
-<section id="collections" className="mx-auto max-w-7xl px-4 py-20"><p className="text-xs uppercase tracking-[.3em] text-amber-500">01 / Collection</p><h2 className="luxury mt-2 text-4xl">Signature Timepieces</h2><p className="mt-4 max-w-2xl text-zinc-500">A focused edit of leather, steel and couple's watches designed for everyday wear and special moments.</p><div className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{products.map(p=><ProductCard key={p.id} p={p}/>)}</div></section>
-<section id="latest" className="border-y border-white/5 bg-[#070707]"><div className="mx-auto max-w-7xl px-4 py-20"><p className="text-xs uppercase tracking-[.3em] text-amber-500">02 / Latest</p><h2 className="luxury mt-2 text-4xl">Latest & Trending</h2><div className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{latest.map(p=><ProductCard key={p.id} p={p}/>)}</div></div></section>
-<section className="mx-auto max-w-7xl px-4 py-20"><p className="text-xs uppercase tracking-[.3em] text-amber-500">03 / Detail</p><div className="mt-3 grid gap-8 lg:grid-cols-3"><div className="panel rounded-3xl p-7"><p className="text-amber-400">Precision</p><h3 className="luxury mt-3 text-2xl">Quartz accuracy</h3><p className="mt-3 text-sm leading-7 text-zinc-500">Reliable movements and clear specifications help you choose with confidence.</p></div><div className="panel rounded-3xl p-7"><p className="text-amber-400">Materials</p><h3 className="luxury mt-3 text-2xl">Made to wear</h3><p className="mt-3 text-sm leading-7 text-zinc-500">Choose from authentic leather, stainless steel and rubber strap options.</p></div><div className="panel rounded-3xl p-7"><p className="text-amber-400">Presentation</p><h3 className="luxury mt-3 text-2xl">Gift-ready</h3><p className="mt-3 text-sm leading-7 text-zinc-500">Selected couple and occasion pieces make memorable gifts.</p></div></div></section>
-<section className="border-y border-white/5 bg-[#080808]"><div className="mx-auto grid max-w-7xl gap-12 px-4 py-20 lg:grid-cols-2 lg:items-center"><div><p className="text-xs uppercase tracking-[.3em] text-amber-500">04 / Assurance</p><h2 className="luxury mt-3 text-4xl">Confidence with every order.</h2><p className="mt-5 leading-8 text-zinc-500">Shop with clear product information, stock-aware cart controls and straightforward customer support.</p></div><div className="grid gap-3 sm:grid-cols-2"><div className="rounded-2xl border border-amber-500/20 p-5"><b className="text-amber-400">Warranty</b><p className="mt-2 text-sm text-zinc-500">1-Year International Warranty on qualifying pieces.</p></div><div className="rounded-2xl border border-amber-500/20 p-5"><b className="text-amber-400">Returns</b><p className="mt-2 text-sm text-zinc-500">30 Days Hassle-free returns.</p></div><div className="rounded-2xl border border-amber-500/20 p-5"><b className="text-amber-400">Stock</b><p className="mt-2 text-sm text-zinc-500">Live availability is checked before adding to cart.</p></div><div className="rounded-2xl border border-amber-500/20 p-5"><b className="text-amber-400">Checkout</b><p className="mt-2 text-sm text-zinc-500">Authenticated checkout with order confirmation.</p></div></div></div></section>
-<section className="mx-auto max-w-7xl px-4 py-20"><p className="text-xs uppercase tracking-[.3em] text-amber-500">05 / Shopping</p><div className="mt-3 grid gap-5 md:grid-cols-3"><div className="panel rounded-2xl p-6"><span className="finance text-amber-400">01</span><h3 className="luxury mt-3 text-2xl">Choose</h3><p className="mt-2 text-sm leading-6 text-zinc-500">Open quick view, compare details and select your quantity.</p></div><div className="panel rounded-2xl p-6"><span className="finance text-amber-400">02</span><h3 className="luxury mt-3 text-2xl">Checkout</h3><p className="mt-2 text-sm leading-6 text-zinc-500">Review your cart and securely submit customer and delivery details.</p></div><div className="panel rounded-2xl p-6"><span className="finance text-amber-400">03</span><h3 className="luxury mt-3 text-2xl">Track</h3><p className="mt-2 text-sm leading-6 text-zinc-500">Your order moves through Pending, Confirmed and Delivered stages.</p></div></div></section>
-<section id="advisor" className="border-y border-white/5 bg-[#070707]"><div className="mx-auto max-w-7xl px-4 py-20"><p className="text-xs uppercase tracking-[.3em] text-amber-500">06 / Advisor</p><h2 className="luxury mt-2 text-4xl">AI Timepiece Advisor</h2><p className="mt-4 mb-8 max-w-2xl text-zinc-500">Ask about style, specifications, warranty, gifting or budget.</p><AIAdvisor/></div></section>
-<section className="mx-auto max-w-7xl px-4 py-20"><p className="text-xs uppercase tracking-[.3em] text-amber-500">07 / Final Edit</p><div className="rounded-[2rem] border border-amber-500/20 bg-[#0a0a0a] p-8 text-center sm:p-12"><h2 className="luxury text-4xl">Find your next signature piece.</h2><p className="mx-auto mt-4 max-w-2xl text-zinc-500">Explore the collection and use Quick View to see every important detail before you order.</p><Link href="#collections" className="mt-7 inline-flex rounded-xl bg-amber-500 px-7 py-3 font-bold text-black">Shop Watches</Link></div></section>
-<Footer/><QuickView/></main>}
+import Link from "next/link";
+import { ArrowRight, Check, ChevronRight, Crown, Gem, ShieldCheck, Truck } from "lucide-react";
+import { db } from "@/lib/db";
+import { parseProduct } from "@/lib/format";
+import ProductCard from "@/components/ProductCard";
+import QuickView from "@/components/QuickView";
+import AIAdvisor from "@/components/AIAdvisor";
+import Footer from "@/components/Footer";
+
+export default async function Home() {
+  const products = (await db.product.findMany({ where: { active: true }, orderBy: { createdAt: "asc" } })).map(parseProduct);
+  const latest = [...products].reverse();
+  const categories = [
+    { name: "Men's Watches", image: products.find(p => p.type === "Men's Watches")?.images?.[0] || products[0]?.images?.[0] },
+    { name: "Women's Watches", image: products.find(p => p.type === "Women's Watches")?.images?.[0] || products[2]?.images?.[0] },
+    { name: "Sports Watches", image: products.find(p => p.type === "Sports Watches")?.images?.[0] || products[5]?.images?.[0] },
+    { name: "Couple's Watches", image: products.find(p => p.type === "Couple's Watches")?.images?.[0] || products[3]?.images?.[0] },
+    { name: "Limited Edition", image: products.find(p => p.type === "Limited Edition")?.images?.[0] || products[4]?.images?.[0] },
+  ];
+  const hero = products[0];
+
+  return <main>
+    <section className="hero">
+      <div className="hero-glow" />
+      <div className="hero-copy">
+        <p className="eyebrow">THE NOVIS WATCH HOUSE</p>
+        <h1>Timeless luxury.<br /><span>Crafted for you.</span></h1>
+        <p className="hero-text">Precision timepieces designed with quiet confidence, refined materials and a standard that does not need to shout.</p>
+        <div className="hero-actions"><Link href="#collections" className="gold-button">Shop Collection <ArrowRight size={16}/></Link><Link href="#latest" className="outline-button">Explore New Arrivals</Link></div>
+        <div className="hero-points"><span><Check size={14}/> Authentic timepieces</span><span><Check size={14}/> International warranty</span></div>
+      </div>
+      <div className="hero-watch">
+        <div className="hero-ring" />
+        {hero && <img src={hero.images[0]} alt={hero.name} />}
+        <div className="hero-badge"><Crown size={18}/><strong>AUTHENTIC</strong><span>Novis Timepieces</span></div>
+      </div>
+    </section>
+
+    <section className="assurance-strip"><div><Truck/><strong>Free Shipping</strong><span>On qualifying orders</span></div><div><ShieldCheck/><strong>1-Year Warranty</strong><span>International coverage</span></div><div><ArrowRight/><strong>Easy Returns</strong><span>30-day return policy</span></div><div><Gem/><strong>Premium Quality</strong><span>Carefully selected pieces</span></div></section>
+
+    <section id="collections" className="section-shell">
+      <SectionHeading eyebrow="THE COLLECTION" title="Shop by category" text="A considered selection of watches for work, weekends, milestones and everything between." />
+      <div className="category-grid">{categories.map(c => <Link href="#latest" key={c.name} className="category-card"><img src={c.image} alt={c.name}/><div><h3>{c.name}</h3><span>Explore collection <ArrowRight size={13}/></span></div></Link>)}</div>
+    </section>
+
+    <section id="latest" className="section-shell section-dark">
+      <SectionHeading eyebrow="NOVIS EDIT" title="Best sellers" text="The pieces customers keep coming back for, presented with the details that matter." />
+      <div className="product-grid">{products.slice(0, 6).map(p => <ProductCard key={p.id} p={p}/>)}</div>
+      <div className="center-action"><Link href="#collections" className="outline-button">View the full collection <ArrowRight size={16}/></Link></div>
+    </section>
+
+    <section className="section-shell feature-banners"><Promo title="Limited time offer" heading="Up to 25% off selected pieces" image={products[5]?.images?.[0]} action="Shop offers"/><Promo title="The latest edit" heading="New arrivals, chosen for now" image={latest[0]?.images?.[0]} action="Discover new arrivals"/><Promo title="For every moment" heading="A gift that keeps time" image={products[4]?.images?.[0]} action="Shop gifts"/></section>
+
+    <section className="section-shell craftsmanship"><div className="craft-image">{products[1] && <img src={products[1].images[1] || products[1].images[0]} alt="Novis watch craftsmanship"/>}</div><div className="craft-copy"><p className="eyebrow">THE NOVIS STANDARD</p><h2>Made to be worn.<br/><span>Made to be remembered.</span></h2><p>Every Novis piece is selected around proportion, legibility, material quality and everyday wearability. The result is a collection that looks considered without becoming precious.</p><div className="craft-list"><span><Check size={16}/> Thoughtful proportions</span><span><Check size={16}/> Reliable movements</span><span><Check size={16}/> Gift-ready presentation</span><span><Check size={16}/> Clear product information</span></div><Link href="/about" className="text-link">Discover the Novis standard <ArrowRight size={15}/></Link></div></section>
+
+    <section className="brand-section"><SectionHeading eyebrow="THE NOVIS HOUSE" title="A signature point of view" text="Luxury does not require visual noise. Our black-and-gold identity keeps the product at the center." /><div className="brand-grid"><div><span>01</span><h3>Precision</h3><p>Clear specifications and reliable movements.</p></div><div><span>02</span><h3>Presence</h3><p>Balanced cases, considered finishes and strong silhouettes.</p></div><div><span>03</span><h3>Service</h3><p>Responsive support from selection through delivery.</p></div></div></section>
+
+    <section className="testimonial-section"><SectionHeading eyebrow="CUSTOMER NOTES" title="What customers say" /><div className="testimonial-grid"><Review name="James R." text="The watch arrived beautifully presented and the details matched the product page exactly."/><Review name="Sophia M." text="Clean ordering experience, helpful support and a very polished timepiece."/><Review name="Daniel K." text="The finish is understated and elegant. It works equally well for work and formal occasions."/></div></section>
+
+    <section className="advisor-section"><SectionHeading eyebrow="NOVIS CONCIERGE" title="Find the watch that fits the moment" text="Use the AI advisor for questions about style, specifications, budget, gifting and warranty."/><AIAdvisor/></section>
+    <Footer/><QuickView/>
+  </main>;
+}
+
+function SectionHeading({ eyebrow, title, text }: { eyebrow: string; title: string; text?: string }) { return <div className="section-heading"><p className="eyebrow">{eyebrow}</p><h2>{title}</h2>{text && <p>{text}</p>}</div>; }
+function Promo({ title, heading, image, action }: { title:string; heading:string; image?:string; action:string }) { return <Link href="#latest" className="promo"><img src={image} alt=""/><div><p>{title}</p><h3>{heading}</h3><span>{action} <ChevronRight size={14}/></span></div></Link>; }
+function Review({ name, text }: {name:string;text:string}) { return <article className="review"><div className="stars">★★★★★</div><p>“{text}”</p><strong>{name}</strong></article>; }

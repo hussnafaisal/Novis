@@ -1,40 +1,48 @@
-<<<<<<< HEAD
-# Sveston Luxury AI Suite
+# Novis Timepieces
 
-Production-ready Next.js 14 watch e-commerce platform using TypeScript, React, Tailwind CSS and a file-backed JSON store.
+A premium black-and-gold luxury watch e-commerce website built with Next.js, React, TypeScript and Tailwind CSS.
 
-## Run
+## Included
+
+- Responsive luxury storefront for desktop, tablet and mobile
+- Black, champagne-gold visual system with editorial serif typography
+- Hero, categories, best sellers, promotional banners, craftsmanship section, testimonials and AI concierge
+- Product quick view with gallery, specifications, stock state and quantity controls
+- Persistent shopping cart with localStorage
+- Customer sign-up, sign-in, protected checkout and account page
+- Cash-on-delivery checkout with server-side stock verification
+- Automatic stock reduction after successful orders
+- Admin authentication
+- Admin product creation, editing, soft deletion, stock management and image upload
+- Admin order management and invoice generation
+- Contact form stored in the local data store
+- Streaming AI concierge with a safe local fallback when AI environment variables are not configured
+- Usage counters for AI messages and estimated tokens
+
+## Run locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Admin
+Open `http://localhost:3000`.
 
-Open `/admin/login`.
+## Environment
 
-- Username: `muttahir`
-- Password: `muttahir123@`
+Copy `.env.example` to `.env.local` and set production credentials before deployment.
 
-## Included
+```env
+AUTH_SECRET="replace-with-a-long-random-secret"
+ADMIN_USERNAME="your-admin-username"
+ADMIN_PASSWORD="your-strong-admin-password"
+AI_API_URL=""
+AI_API_KEY=""
+AI_MODEL=""
+```
 
-- Black & Gold responsive storefront
-- Product collection and latest products
-- Product quick view with multi-angle gallery, warranty, specifications and stock-aware quantity controls
-- Cart and authenticated checkout
-- Customer sign in, sign up and forgot-password flow
-- Streaming AI Timepiece Advisor at `/api/chat`
-- Usage API at `/api/usage`
-- Protected admin login and dashboard
-- Revenue, acquisition cost, profit/loss and 7-day performance metrics
-- Live inventory with add, edit, remove and stock updates
-- Pending → Confirmed → Delivered order workflow
-- Automatic invoice number generation when an order is confirmed
-- Invoice viewing for confirmed orders
+If AI variables are empty, the concierge uses the built-in streaming fallback so the UI remains functional.
 
-Runtime data is stored in `data/store.json`.
-=======
-# Novis
-Novis — Full-stack luxury watch e-commerce platform with product management, cart, authentication, orders, invoices, inventory, and admin dashboard.
->>>>>>> 91e8cde50aa079ed6315d528c5f8608f68de4207
+## Important
+
+The default development data store is `data/store.json`. This is intentionally simple for local/demo deployment. For production-scale commerce, replace it with a transactional database and a real payment provider before accepting live payments.

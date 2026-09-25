@@ -1,7 +1,9 @@
 "use client";
-import { createContext, useContext, useState } from "react";
+
+import { createContext, useContext, useEffect, useState } from "react";
 
 type Item = { id: string; quantity: number };
+type Product = { id: string; stock: number };
 type Ctx = {
   cart: Item[];
   add: (id: string, q?: number) => void;
@@ -17,6 +19,19 @@ const C = createContext<Ctx | null>(null);
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<Item[]>([]);
   const [selected, setSelected] = useState<any>(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("novis-cart");
+      if (saved) setCart(JSON.parse(saved));
+    } catch {
+      localStorage.removeItem("novis-cart");
+    }
+  }, []);
+
+  useEffect(() => {
+    try { localStorage.setItem("novis-cart", JSON.stringify(cart)); } catch {}
+  }, [cart]);
 
   function add(id: string, q = 1) {
     if (q < 1) return;
@@ -35,15 +50,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <C.Provider value={{
-      cart,
-      add,
-      setQty,
-      remove: (id) => setQty(id, 0),
-      clearCart: () => setCart([]),
-      openProduct: setSelected,
-      selected,
-    }}>
+    <C.Provider value={{ cart, add, setQty, remove: (id) => setQty(id, 0), clearCart: () => setCart([]), openProduct: setSelected, selected }}>
       {children}
     </C.Provider>
   );

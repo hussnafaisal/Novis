@@ -1,4 +1,4 @@
-Sveston Luxury AI Suite
+Novis Luxury AI Suite
 
 Application files:
 app/about/page.tsx

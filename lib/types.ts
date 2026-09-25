@@ -33,8 +33,10 @@ export type Order = {
   address?: string;
   city?: string;
   total: number;
-  status: "Pending" | "Confirmed" | "Delivered";
+  status: "Pending" | "Confirmed" | "Out for Delivery" | "Delivered" | "Return";
   createdAt: string;
   confirmedAt?: string | null;
+  deliveredAt?: string | null;
+  returnedAt?: string | null;
   items: OrderItem[];
 };
