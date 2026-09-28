@@ -1,0 +1,3 @@
+import {prisma} from '../lib/prisma.js'; import {getToken,verifyToken} from '../utils/auth.js';
+export async function requireAuth(req,res,next){try{const t=getToken(req);if(!t)return res.status(401).json({message:'Authentication required'});const p=verifyToken(t);const u=await prisma.user.findUnique({where:{id:p.id}});if(!u)return res.status(401).json({message:'Invalid session'});req.user=u;next();}catch{return res.status(401).json({message:'Invalid or expired session'});}}
+export const requireAdmin=(req,res,next)=>req.user?.role==='ADMIN'?next():res.status(403).json({message:'Admin access required'});

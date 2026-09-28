@@ -1,0 +1,2 @@
+import {Moon,Sun} from 'lucide-react';
+export default function ThemeToggle({theme,setTheme}){return <button aria-label="Toggle theme" className={`theme-toggle ${theme}`} onClick={()=>setTheme(theme==='dark'?'light':'dark')}><span className="toggle-track"><span className="toggle-thumb">{theme==='dark'?<Moon size={11}/>:<Sun size={11}/>}</span></span><span>{theme==='dark'?'Light':'Dark'}</span></button>}

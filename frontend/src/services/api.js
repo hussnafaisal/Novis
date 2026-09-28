@@ -1,0 +1,25 @@
+const API=import.meta.env.VITE_API_URL||'http://localhost:4000/api';
+export async function api(path,{method='GET',body,token,headers={}}={}){const res=await fetch(`${API}${path}`,{method,credentials:'include',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{ }),...headers},body:body===undefined?undefined:JSON.stringify(body)});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.message||`Request failed (${res.status})`);return data;}
+export const getProducts=(params='')=>api(`/products${params?`?${params}`:''}`);
+export const login=(body)=>api('/auth/login',{method:'POST',body});
+export const register=(body)=>api('/auth/register',{method:'POST',body});
+export const getMe=()=>api('/auth/me');
+export const logout=()=>api('/auth/logout',{method:'POST'});
+export const getCart=token=>api('/cart',{token});
+export const addCart=(token,productId,quantity=1)=>api('/cart/items',{method:'POST',token,body:{productId,quantity}});
+export const updateCart=(token,productId,quantity)=>api(`/cart/items/${productId}`,{method:'PATCH',token,body:{quantity}});
+export const removeCart=(token,productId)=>api(`/cart/items/${productId}`,{method:'DELETE',token});
+export const createOrder=(token,body)=>api('/orders',{method:'POST',token,body});
+export const getMyOrders=token=>api('/orders/mine',{token});
+export const getMyMessages=token=>api('/content/my-messages',{token});
+export const getAdminDashboard=token=>api('/admin/dashboard',{token});
+export const getAdminOrders=token=>api('/orders',{token});
+export const updateOrderStatus=(token,id,status)=>api(`/orders/${id}/status`,{method:'PATCH',token,body:{status}});
+export const getAdminCustomers=token=>api('/admin/customers',{token});
+export const createStripeCheckout=(token,orderId)=>api('/payments/stripe/checkout',{method:'POST',token,body:{orderId}});
+export const getAdminContacts=token=>api('/admin/contacts',{token});
+export const replyContact=(token,id,reply)=>api(`/admin/contacts/${id}`,{method:'PATCH',token,body:{reply}});
+export const createProduct=(token,body)=>api('/products',{method:'POST',token,body});
+export const updateProduct=(token,id,body)=>api(`/products/${id}`,{method:'PUT',token,body});
+export const deleteProduct=(token,id)=>api(`/products/${id}`,{method:'DELETE',token});
+export const updateAdminOrder=(token,id,body)=>api(`/admin/orders/${id}`,{method:'PATCH',token,body});
