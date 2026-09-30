@@ -3,7 +3,7 @@
   "buildCommand": "npx prisma generate --schema=./prisma/schema.prisma",
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/api/(.*)",
       "dest": "src/server.js"
     }
   ]
