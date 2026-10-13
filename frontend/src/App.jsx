@@ -17,6 +17,7 @@ import Login from './components/Login';
 import ResetPassword from './components/ResetPassword';
 import Notifications from './components/Notifications';
 import AdminDashboard from './admin/AdminDashboard';
+import Chatbot from './components/Chatbot';
 import { api, getProducts, getCart, addCart, updateCart, removeCart, login, logout } from './services/api';
 import './styles/globals.css';
 
@@ -171,7 +172,7 @@ function Storefront() {
       return [];
     }
   });
-  const [token, setToken] = useState(() => localStorage.getItem('novis-token') || '');
+  const [token, setToken] = useState(() => localStorage.getItem('novis-customer-token') || '');
   const [user, setUser] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -237,7 +238,7 @@ function Storefront() {
       })
       .catch(() => {
         if (!alive) return;
-        localStorage.removeItem('novis-token');
+        localStorage.removeItem('novis-customer-token');
         setToken('');
         setUser(null);
       });
@@ -303,9 +304,27 @@ function Storefront() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      if (token) await logout(token);
+    } catch (error) {
+      console.warn('NOVIS customer logout:', error);
+    } finally {
+      localStorage.removeItem('novis-customer-token');
+      localStorage.removeItem('novis-last-customer-email');
+      setToken('');
+      setUser(null);
+      setCartOpen(false);
+      navigate('/login');
+      window.dispatchEvent(new CustomEvent('novis-toast', { detail: 'You have been logged out successfully.' }));
+    }
+  };
+
   const handleLogin = async (email, password) => {
     const data = await login({ email, password });
-    localStorage.setItem('novis-token', data.token);
+    if (data.user.role === 'ADMIN') throw new Error('Please use the private admin sign-in page.');
+    localStorage.setItem('novis-customer-token', data.token);
+    localStorage.setItem('novis-last-customer-email', data.user.email);
     setToken(data.token);
     setUser(data.user);
     navigate('/');
@@ -330,6 +349,8 @@ function Storefront() {
         theme={theme}
         setTheme={setTheme}
         token={token}
+        user={user}
+        onLogout={handleLogout}
       />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} cartCount={count} setCartOpen={setCartOpen} setSearchOpen={setSearchOpen} theme={theme} setTheme={setTheme} />
 
@@ -355,6 +376,7 @@ function Storefront() {
       <Footer theme={theme} setTheme={setTheme} />
       <Cart open={cartOpen} setOpen={setCartOpen} items={items} setItems={setItems} onChange={change} onRemove={remove} token={token} />
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} products={products} onOpen={(p) => navigate(`/product/${p.slug}`)} />
+      <Chatbot />
       {toast && <div className="site-toast" role="alert">{toast}</div>}
     </div>
   );
@@ -365,7 +387,7 @@ function AdminRoute() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('novis-token');
+    const token = localStorage.getItem('novis-admin-token');
     if (!token) {
       setLoading(false);
       return;
@@ -373,7 +395,7 @@ function AdminRoute() {
     api('/auth/me', { token })
       .then((data) => setUser(data.user))
       .catch(() => {
-        localStorage.removeItem('novis-token');
+        localStorage.removeItem('novis-admin-token');
         setUser(null);
       })
       .finally(() => setLoading(false));
@@ -401,8 +423,8 @@ function AdminLogin({ onLogin }) {
     try {
       setBusy(true);
       const data = await login({ email: email.trim(), password });
-      if (data.user.role !== 'ADMIN') throw new Error('This account is not an admin account.');
-      localStorage.setItem('novis-token', data.token);
+      if (data.user.role !== 'ADMIN') throw new Error('Access denied. An administrator account is required.');
+      localStorage.setItem('novis-admin-token', data.token);
       onLogin(data.user);
     } catch (error) {
       setError(error?.message || 'Unable to sign in. Please check your details.');
@@ -417,9 +439,9 @@ function AdminLogin({ onLogin }) {
         <div className="admin-logo"><strong>NOVIS</strong><small>ADMIN CONTROL</small></div>
         <h1>Admin Sign in</h1>
         <p>Private administration area.</p>
-        <input autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Admin email" type="email" />
+        <input autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Admin email" type="email" />
         <div className="admin-password">
-          <input autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} type={show ? 'text' : 'password'} placeholder="Password" />
+          <input autoComplete="current-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} type={show ? 'text' : 'password'} placeholder="Password" />
           <button type="button" onClick={() => setShow((value) => !value)}>{show ? 'HIDE' : 'SHOW'}</button>
         </div>
         <button type="submit" disabled={busy}>{busy ? 'PLEASE WAIT…' : 'ENTER DASHBOARD'}</button>

@@ -1,3 +1,4 @@
+import { money } from '../lib/money';
 import { useMemo, useState } from 'react';
 import { ArrowRight, Eye, ShoppingBag, X, PackageOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -60,7 +61,7 @@ export default function Collection({ products = [], onOpen, onAdd, initialCatego
               </div>
               <button type="button" className="product-info product-info-button" onClick={() => onOpen(product)} aria-label={`View ${product.name}`}>
                 <div><span>{product.brand || 'NOVIS'} · {product.type} · {product.size}</span><h2>{product.name}</h2></div>
-                <strong>${Number(product.price).toLocaleString()}</strong>
+                <strong>{money(product.price)}</strong>
               </button>
             </article>
           ))}
@@ -84,7 +85,7 @@ export default function Collection({ products = [], onOpen, onAdd, initialCatego
               <span className="eyebrow">QUICK VIEW</span>
               <h2>{quick.name}</h2>
               <p className="spec">{quick.brand || 'NOVIS'} · {quick.type} · {quick.size}</p>
-              <strong className="quick-price">${Number(quick.price).toLocaleString()}</strong>
+              <strong className="quick-price">{money(quick.price)}</strong>
               <p>{quick.description}</p>
               <div className="quick-buttons">
                 <button className="lux-btn gold" type="button" disabled={Number(quick.stock) <= 0} onClick={() => { onAdd(quick); setQuick(null); }}>{Number(quick.stock) > 0 ? 'ADD TO BAG' : 'OUT OF STOCK'}</button>

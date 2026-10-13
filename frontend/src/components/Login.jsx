@@ -54,12 +54,13 @@ function Captcha({ onValid }) {
 
 export default function Login({ onLogin, user, mode = 'login' }) {
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => mode === 'login' ? (localStorage.getItem('novis-last-customer-email') || '') : '');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [code, setCode] = useState('');
   const [show, setShow] = useState(false);
   const [captcha, setCaptcha] = useState(false);
+  const [captchaKey, setCaptchaKey] = useState(0);
   const [msg, setMsg] = useState('');
   const [success, setSuccess] = useState('');
   const [busy, setBusy] = useState(false);
@@ -70,8 +71,9 @@ export default function Login({ onLogin, user, mode = 'login' }) {
     setMsg('');
     setSuccess('');
     setCaptcha(false);
+    setCaptchaKey((value) => value + 1);
     setName('');
-    setEmail('');
+    setEmail(mode === 'login' ? (localStorage.getItem('novis-last-customer-email') || '') : '');
     setPassword('');
     setConfirm('');
     setCode('');
@@ -100,13 +102,15 @@ export default function Login({ onLogin, user, mode = 'login' }) {
     setMsg('');
     setSuccess('');
 
-    if (!captcha) {
+    if (mode === 'forgot' && forgotStep === 'email' && !captcha) {
       setMsg('Please complete the CAPTCHA check before continuing.');
       return;
     }
 
     try {
       setBusy(true);
+      const cleanPassword = password.trim();
+      const cleanConfirm = confirm.trim();
 
       if (mode === 'forgot' && forgotStep === 'email') {
         const data = await api('/auth/forgot-password', {
@@ -122,27 +126,23 @@ export default function Login({ onLogin, user, mode = 'login' }) {
 
         setAccountExists(true);
         setForgotStep('verify');
-        setSuccess(data.devCode ? `Verification code: ${data.devCode}` : 'A new verification code has been sent to your email.');
+        setSuccess('CAPTCHA verified. Choose and confirm your new password below.');
         return;
       }
 
       if (mode === 'forgot') {
-        if (!/^\d{6}$/.test(code)) {
-          setMsg('Please enter the 6-digit verification code.');
-          return;
-        }
-        if (password.length < 8) {
+                if (cleanPassword.length < 8) {
           setMsg('Password must be at least 8 characters.');
           return;
         }
-        if (password !== confirm) {
-          setMsg('Passwords do not match.');
+        if (cleanPassword !== cleanConfirm) {
+          setMsg('The two password fields must match exactly. Please check both fields.');
           return;
         }
 
         const data = await api('/auth/reset-password', {
           method: 'POST',
-          body: { email: email.trim(), code, password },
+          body: { email: email.trim(), password: cleanPassword },
         });
         setSuccess(data.message || 'Password updated. You can now sign in.');
         setForgotStep('done');
@@ -157,21 +157,22 @@ export default function Login({ onLogin, user, mode = 'login' }) {
           setMsg('Please enter your full name.');
           return;
         }
-        if (password.length < 8) {
+        if (cleanPassword.length < 8) {
           setMsg('Password must be at least 8 characters.');
           return;
         }
-        if (password !== confirm) {
-          setMsg('Passwords do not match.');
+        if (cleanPassword !== cleanConfirm) {
+          setMsg('The two password fields must match exactly. Please check both fields.');
           return;
         }
-        const data = await api('/auth/register', { method: 'POST', body: { name: name.trim(), email: email.trim(), password } });
-        localStorage.setItem('novis-token', data.token);
+        const data = await api('/auth/register', { method: 'POST', body: { name: name.trim(), email: email.trim(), password: cleanPassword } });
+        localStorage.setItem('novis-customer-token', data.token);
+        localStorage.setItem('novis-last-customer-email', data.user.email);
         window.location.href = '/';
         return;
       }
 
-      await onLogin(email.trim(), password);
+      await onLogin(email.trim(), cleanPassword);
     } catch (error) {
       setMsg(error?.message || 'Something went wrong. Please check the information and try again.');
     } finally {
@@ -188,10 +189,10 @@ export default function Login({ onLogin, user, mode = 'login' }) {
       </div>
       <div className="auth-card">
         <span className="eyebrow">{mode === 'login' ? 'SIGN IN' : mode === 'signup' ? 'CREATE ACCOUNT' : 'RESET PASSWORD'}</span>
-        <h1>{mode === 'forgot' ? (forgotDone ? 'Password updated' : forgotStep === 'verify' ? 'Enter your new code' : 'Forgot your password?') : mode === 'signup' ? 'Create your NOVIS account' : 'Welcome back'}</h1>
+        <h1>{mode === 'forgot' ? (forgotDone ? 'Password updated' : forgotStep === 'verify' ? 'Choose a new password' : 'Forgot your password?') : mode === 'signup' ? 'Create your NOVIS account' : 'Welcome back'}</h1>
         <p>
           {mode === 'forgot'
-            ? (forgotDone ? 'Your old password is no longer valid. Use your new password to sign in.' : forgotStep === 'verify' ? 'We found your account. Enter the new 6-digit code and choose a new password. Your old password is not required.' : 'Enter your registered email. If the account exists, you will receive a fresh verification code.')
+            ? (forgotDone ? 'Your old password is no longer valid. Use your new password to sign in.' : forgotStep === 'verify' ? 'CAPTCHA passed. Choose a new password for this local demo account.' : 'Enter your registered email and complete the CAPTCHA check to continue.')
             : mode === 'signup'
               ? 'Create an account to save your details and orders.'
               : 'Sign in to manage your orders and profile.'}
@@ -212,11 +213,7 @@ export default function Login({ onLogin, user, mode = 'login' }) {
               </div>
             </label>
 
-            {mode === 'forgot' && forgotStep === 'verify' && (
-              <label>6-DIGIT VERIFICATION CODE
-                <input inputMode="numeric" maxLength={6} required value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="000000" />
-              </label>
-            )}
+            
 
             {mode !== 'forgot' && (
               <label>PASSWORD
@@ -224,6 +221,15 @@ export default function Login({ onLogin, user, mode = 'login' }) {
                   <Lock size={16} />
                   <input autoComplete={mode === 'login' ? 'current-password' : 'new-password'} required minLength={8} type={show ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Minimum 8 characters" />
                   <button type="button" onClick={() => setShow((value) => !value)} aria-label={show ? 'Hide password' : 'Show password'}>{show ? <EyeOff size={16} /> : <Eye size={16} />}</button>
+                </div>
+              </label>
+            )}
+
+            {mode === 'signup' && (
+              <label>CONFIRM PASSWORD
+                <div className="input-icon">
+                  <Lock size={16} />
+                  <input autoComplete="new-password" required minLength={8} type={show ? 'text' : 'password'} value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Repeat your password" />
                 </div>
               </label>
             )}
@@ -238,14 +244,14 @@ export default function Login({ onLogin, user, mode = 'login' }) {
                   </div>
                 </label>
                 <label>CONFIRM NEW PASSWORD
-                  <input autoComplete="new-password" required minLength={8} type={show ? 'text' : 'password'} value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Repeat new password" />
+                  <input autoComplete="new-password" required minLength={8} type={show ? 'text' : 'password'} value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Type the same password again" />
                 </label>
               </>
             )}
 
-            <Captcha onValid={setCaptcha} />
+            {mode === 'forgot' && forgotStep === 'email' && <Captcha key={captchaKey} onValid={setCaptcha} />}
             <button className="lux-btn gold" type="submit" disabled={busy}>
-              {busy ? 'PLEASE WAIT…' : mode === 'forgot' ? (forgotStep === 'verify' ? 'UPDATE PASSWORD' : 'CHECK EMAIL') : mode === 'signup' ? 'CREATE ACCOUNT' : 'SIGN IN'}
+              {busy ? 'PLEASE WAIT…' : mode === 'forgot' ? (forgotStep === 'verify' ? 'UPDATE PASSWORD' : 'VERIFY CAPTCHA & CONTINUE') : mode === 'signup' ? 'CREATE ACCOUNT' : 'SIGN IN'}
             </button>
           </form>
         )}
@@ -253,10 +259,12 @@ export default function Login({ onLogin, user, mode = 'login' }) {
         {success && <small className="form-msg success-msg"><CheckCircle2 size={14} />{success}</small>}
         {msg && <small className="form-msg error-msg"><AlertCircle size={14} />{msg}</small>}
 
+        {mode === 'forgot' && forgotStep === 'email' && msg && (
+          <button className="resend-code" type="button" onClick={() => { setCaptcha(false); setCaptchaKey((value) => value + 1); setMsg(''); setEmail(''); }}>TRY ANOTHER EMAIL</button>
+        )}
+
         {mode === 'forgot' && forgotStep === 'verify' && accountExists && (
-          <button className="resend-code" type="button" onClick={() => { setForgotStep('email'); setCaptcha(false); setSuccess(''); setMsg(''); }}>
-            USE ANOTHER EMAIL / GET A NEW CODE
-          </button>
+          <button className="resend-code" type="button" onClick={() => { setForgotStep('email'); setCaptcha(false); setCaptchaKey((value) => value + 1); setSuccess(''); setMsg(''); setPassword(''); setConfirm(''); }}>USE ANOTHER EMAIL</button>
         )}
 
         <div className="auth-links">

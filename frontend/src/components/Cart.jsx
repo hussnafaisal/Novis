@@ -1,3 +1,4 @@
+import { money } from '../lib/money';
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Minus, Plus, Trash2, ShieldCheck, Truck, Clock3, AlertCircle, CheckCircle2 } from 'lucide-react';
@@ -14,7 +15,7 @@ export default function Cart({ open, setOpen, items, setItems, onChange, onRemov
   const [busy, setBusy] = useState(false);
 
   const subtotal = useMemo(() => items.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.qty || 0), 0), [items]);
-  const total = subtotal + (gift ? 25 : 0);
+  const total = subtotal + (gift ? 2500 : 0);
 
   useEffect(() => {
     if (!open) {
@@ -92,7 +93,7 @@ export default function Cart({ open, setOpen, items, setItems, onChange, onRemov
                   <div className="cart-item-copy">
                     <h3>{item.name}</h3>
                     <p>{item.type} · {item.size}</p>
-                    <strong>${Number(item.price).toLocaleString()}</strong>
+                    <strong>{money(item.price)}</strong>
                     <div className="qty">
                       <button onClick={() => Number(item.qty) > 1 ? onChange(item.id, Number(item.qty) - 1) : onRemove(item.id)} aria-label="Decrease quantity"><Minus size={13} /></button>
                       <span>{item.qty}</span>
@@ -106,8 +107,8 @@ export default function Cart({ open, setOpen, items, setItems, onChange, onRemov
 
             {items.length > 0 && (
               <>
-                <label className="gift"><input type="checkbox" checked={gift} onChange={(event) => setGift(event.target.checked)} /><span>Add a premium gift box <small>$25</small></span></label>
-                <div className="summary"><div><span>Subtotal</span><strong>${subtotal.toLocaleString()}</strong></div><div><span>Shipping</span><strong>Free</strong></div><div className="total"><span>Estimated total</span><strong>${total.toLocaleString()}</strong></div></div>
+                <label className="gift"><input type="checkbox" checked={gift} onChange={(event) => setGift(event.target.checked)} /><span>Add a premium gift box <small>PKR 2,500</small></span></label>
+                <div className="summary"><div><span>Subtotal</span><strong>{money(subtotal)}</strong></div><div><span>Shipping</span><strong>Free</strong></div><div className="total"><span>Estimated total</span><strong>{money(total)}</strong></div></div>
                 <button className="checkout" onClick={startCheckout}>CHECKOUT <span>→</span></button>
               </>
             )}

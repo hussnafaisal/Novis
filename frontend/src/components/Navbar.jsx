@@ -1,9 +1,9 @@
-import {Search,UserRound,ShoppingBag,Menu,X,ChevronDown} from 'lucide-react';
+import {Search,UserRound,ShoppingBag,Menu,X,ChevronDown,LogOut} from 'lucide-react';
 import {Link} from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 import Notifications from './Notifications';
 
-export default function Navbar({cartCount,setCartOpen,setMenuOpen,menuOpen,setSearchOpen,theme,setTheme,token}){
+export default function Navbar({cartCount,setCartOpen,setMenuOpen,menuOpen,setSearchOpen,theme,setTheme,token,user,onLogout}){
   return <header className="nav">
     <div className="nav-inner">
       <Link to="/" className="brand brand-with-logo" aria-label="NOVIS home">
@@ -17,7 +17,12 @@ export default function Navbar({cartCount,setCartOpen,setMenuOpen,menuOpen,setSe
       </nav>
       <div className="nav-actions">
         <button aria-label="Search" onClick={()=>setSearchOpen(true)}><Search size={18}/></button>
-        <Link to="/login" aria-label="Account"><UserRound size={18}/></Link>
+        {user ? (
+          <>
+            <Link to="/login" className="nav-account-link" aria-label="My account" title={`Signed in as ${user.name || user.email}`}><UserRound size={18}/></Link>
+            <button type="button" className="customer-logout" onClick={onLogout} aria-label="Log out" title="Log out"><LogOut size={17}/><span>LOG OUT</span></button>
+          </>
+        ) : <Link to="/login" aria-label="Account"><UserRound size={18}/></Link>}
         <Notifications token={token} compact />
         <button aria-label="Bag" className="bag-btn" onClick={()=>setCartOpen(true)}><ShoppingBag size={18}/><b>{cartCount}</b></button>
         <ThemeToggle theme={theme} setTheme={setTheme}/>
