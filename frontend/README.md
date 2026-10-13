@@ -25,3 +25,9 @@ Watch prices are displayed in Pakistani Rupees (PKR). Starter watch prices are d
 
 
 Customer logout: signed-in customers now see a LOG OUT control in the storefront navigation. It clears the customer session and returns them to the login screen. On small screens, the logout icon remains visible.
+
+## Netlify deployment and admin route
+
+This project includes `netlify.toml` and `public/_redirects` so direct navigation or refresh at `/admin` is routed back to the React app instead of returning a Netlify 404. Deploy from the project root (the directory containing `package.json`) with build command `npm run build` and publish directory `dist`.
+
+Open the admin area at `/admin`. Frontend-only demo admin credentials: `muttahir@novis.local` / `muttahir123@`. Demo data and sessions are stored in the current browser's localStorage and are not shared between devices.
