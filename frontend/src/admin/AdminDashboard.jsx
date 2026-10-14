@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BarChart3, ShoppingBag, Users, Watch, LogOut, Edit3, Trash2, MessageSquare, RefreshCw, X } from 'lucide-react';
-import { getAdminDashboard, getAdminOrders, getAdminCustomers, getAdminContacts, replyContact, createProduct, updateProduct, deleteProduct, logout, getProducts, updateAdminOrder, updateAdminCustomer } from '../services/api';
+import { getAdminDashboard, getAdminOrders, getAdminCustomers, getAdminContacts, replyContact, createProduct, updateProduct, deleteProduct, logout, getProducts, updateAdminOrder } from '../services/api';
 import '../lib/money.js';
 import { money } from '../lib/money.js';
 import './admin.css';
@@ -17,9 +17,6 @@ export default function AdminDashboard({ user, onLogout }) {
   const [dash, setDash] = useState(null);
   const [orders, setOrders] = useState([]);
   const [customers, setCustomers] = useState([]);
-  const [customerEditing, setCustomerEditing] = useState(null);
-  const [customerForm, setCustomerForm] = useState({ name: '', email: '' });
-  const [savingCustomer, setSavingCustomer] = useState(false);
   const [contacts, setContacts] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -65,14 +62,17 @@ export default function AdminDashboard({ user, onLogout }) {
       return;
     }
     if (!productForm.image.trim()) {
-      setError('Please add an image URL.');
+      setError('Please upload a product image or enter an image URL.');
       return;
     }
-    try {
-      new URL(productForm.image.trim());
-    } catch {
-      setError('Image URL is not valid. Please paste a complete image URL.');
-      return;
+    if (!productForm.image.startsWith('data:image/')) {
+      try {
+        const imageUrl = new URL(productForm.image.trim());
+        if (!['http:', 'https:'].includes(imageUrl.protocol)) throw new Error('Unsupported image URL');
+      } catch {
+        setError('Please upload a valid image or enter a complete HTTP/HTTPS image URL.');
+        return;
+      }
     }
     if (Number(productForm.price) < 0 || Number(productForm.stock) < 0) {
       setError('Price and stock cannot be negative.');
@@ -107,6 +107,25 @@ export default function AdminDashboard({ user, onLogout }) {
     } finally {
       setSaving(false);
     }
+  };
+
+  const uploadProductImage = (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setError('Please choose an image file.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setProductForm((current) => ({ ...current, image: reader.result }));
+        setError('');
+      } else setError('Could not read this image. Please try another file.');
+    };
+    reader.onerror = () => setError('Could not read this image. Please try another file.');
+    reader.readAsDataURL(file);
   };
 
   const editProduct = (product) => setProductForm({
@@ -163,43 +182,6 @@ export default function AdminDashboard({ user, onLogout }) {
     }
   };
 
-  const startCustomerEdit = (customer) => {
-    setCustomerEditing(customer.id);
-    setCustomerForm({
-      name: customer.name || customer.profile?.name || '',
-      email: customer.email || customer.profile?.email || '',
-    });
-    setError('');
-  };
-
-  const saveCustomer = async (event) => {
-    event.preventDefault();
-    if (!customerEditing) return;
-    if (customerForm.name.trim().length < 2) {
-      setError('Customer name must be at least 2 characters.');
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerForm.email.trim())) {
-      setError('Enter a valid customer email address.');
-      return;
-    }
-    try {
-      setSavingCustomer(true);
-      setError('');
-      await updateAdminCustomer(token, customerEditing, {
-        name: customerForm.name.trim(),
-        email: customerForm.email.trim().toLowerCase(),
-      });
-      setCustomerEditing(null);
-      setCustomerForm({ name: '', email: '' });
-      await load();
-    } catch (requestError) {
-      setError(friendly(requestError));
-    } finally {
-      setSavingCustomer(false);
-    }
-  };
-
   const handleLogout = async () => {
     const adminToken = localStorage.getItem('novis-admin-token');
     await logout(adminToken).catch(() => {});
@@ -252,12 +234,13 @@ export default function AdminDashboard({ user, onLogout }) {
                 <label>PRICE (PKR)<input type="number" min="0" step="0.01" value={productForm.price} onChange={(e) => setProductForm({ ...productForm, price: e.target.value })} /></label>
                 <label>COMPARE PRICE<input type="number" min="0" step="0.01" value={productForm.compareAt} onChange={(e) => setProductForm({ ...productForm, compareAt: e.target.value })} /></label>
                 <label>BRAND<input autoComplete="off" value={productForm.brand} onChange={(e) => setProductForm({ ...productForm, brand: e.target.value })} /></label>
-                <label>IMAGE URL<input autoComplete="off" type="url" value={productForm.image} onChange={(e) => setProductForm({ ...productForm, image: e.target.value })} placeholder="https://example.com/watch.jpg" /></label>
+                <label>IMAGE URL<input autoComplete="off" type="text" value={productForm.image.startsWith('data:image/') ? '' : productForm.image} onChange={(e) => setProductForm({ ...productForm, image: e.target.value })} placeholder="Paste image URL or upload below" /></label>
+                <label>UPLOAD PRODUCT IMAGE<input type="file" accept="image/*" onChange={uploadProductImage} /><small>No app-imposed file-size limit. Very large files may still exceed browser storage limits.</small></label>
                 <label>CATEGORY<select value={productForm.category} onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}><option value="">Select category</option><option value="men">Men</option><option value="women">Women</option><option value="couple">Couple</option><option value="limited">Limited</option></select></label>
                 <label>STOCK<input type="number" min="0" value={productForm.stock} onChange={(e) => setProductForm({ ...productForm, stock: e.target.value })} /></label>
                 <label className="full">DESCRIPTION<textarea value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })} /></label>
                 <label className="full">FEATURES <small>comma separated</small><input value={productForm.features} onChange={(e) => setProductForm({ ...productForm, features: e.target.value })} /></label>
-                <div className="image-url-preview full">{productForm.image ? <img src={productForm.image} alt="Preview" onError={(e) => { e.currentTarget.style.display = 'none'; }} onLoad={(e) => { e.currentTarget.style.display = 'block'; }} /> : <span>Image preview will appear here after you paste a valid URL.</span>}</div>
+                <div className="image-url-preview full">{productForm.image ? <><img src={productForm.image} alt="Product preview" onError={(e) => { e.currentTarget.style.display = 'none'; }} onLoad={(e) => { e.currentTarget.style.display = 'block'; }} /><button className="text-btn" type="button" onClick={() => setProductForm({ ...productForm, image: '' })}>REMOVE IMAGE</button></> : <span>Product image preview will appear here after you paste a URL or upload an image.</span>}</div>
                 <button className="gold-btn full" type="submit" disabled={saving}>{saving ? 'SAVING…' : editing ? 'UPDATE PRODUCT' : 'ADD PRODUCT'}</button>
               </form>
             </section>
@@ -280,32 +263,7 @@ export default function AdminDashboard({ user, onLogout }) {
         )}
 
         {tab === 'orders' && <OrderManagement orders={orders} onSave={saveOrder} />}
-        {tab === 'customers' && (
-          <section className="admin-panel">
-            <div className="panel-head"><h2>Customers</h2><span>{customers.length} accounts</span></div>
-            {customerEditing && (
-              <form className="customer-edit-form" onSubmit={saveCustomer}>
-                <h3>Update customer</h3>
-                <label>FULL NAME<input value={customerForm.name} onChange={(event) => setCustomerForm({ ...customerForm, name: event.target.value })} required minLength={2} /></label>
-                <label>EMAIL ADDRESS<input type="email" value={customerForm.email} onChange={(event) => setCustomerForm({ ...customerForm, email: event.target.value })} required /></label>
-                <div className="customer-edit-actions">
-                  <button className="gold-btn" type="submit" disabled={savingCustomer}>{savingCustomer ? 'SAVING…' : 'SAVE CUSTOMER'}</button>
-                  <button className="text-btn" type="button" onClick={() => { setCustomerEditing(null); setCustomerForm({ name: '', email: '' }); }}>CANCEL</button>
-                </div>
-              </form>
-            )}
-            <div className="admin-list">
-              {customers.length ? customers.map((customer) => (
-                <div key={customer.id || customer.email}>
-                  <b>{customer.name || customer.profile?.name || 'Customer'}</b>
-                  <span>{customer.email || customer.profile?.email || 'No email'}</span>
-                  <small>{Number(customer.orderCount ?? customer._count?.orders ?? customer.orders?.length ?? 0)} orders · {money(customer.totalSpent || 0)} spent</small>
-                  <button className="text-btn" type="button" onClick={() => startCustomerEdit(customer)}>EDIT CUSTOMER</button>
-                </div>
-              )) : <p className="admin-empty">No customer accounts yet. Customers will appear here after registering on the storefront.</p>}
-            </div>
-          </section>
-        )}
+        {tab === 'customers' && <section className="admin-panel"><div className="panel-head"><h2>Customers</h2></div><div className="admin-list">{customers.length ? customers.map((customer) => <div key={customer.id || customer.email}><b>{customer.name || customer.profile?.name || 'Customer'}</b><span>{customer.email || customer.profile?.email || 'No email'}</span><small>{Number(customer.orderCount ?? customer._count?.orders ?? customer.orders?.length ?? 0)} orders · {money(customer.totalSpent || 0)} spent</small></div>) : <p className="admin-empty">No customer accounts yet. Customers will appear here after registering on the storefront.</p>}</div></section>}
 
         {tab === 'messages' && (
           <section className="admin-panel">

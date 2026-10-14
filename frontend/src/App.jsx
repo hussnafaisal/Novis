@@ -10,6 +10,7 @@ import Journal from './components/Journal';
 import Movement from './components/Movement';
 import Materials from './components/Materials';
 import Story from './components/Story';
+import About from './components/About';
 import Footer from './components/Footer';
 import SearchModal from './components/SearchModal';
 import MobileMenu from './components/MobileMenu';
@@ -108,9 +109,11 @@ function Contact({ token }) {
           <h2>We are here to help.</h2>
           <p>For product questions, order support, private appointments or general enquiries, send us a message. Your enquiry is delivered directly to the NOVIS administration team.</p>
           <div className="contact-info">
-            <span>EMAIL</span><b>hello@novis.com</b>
-            <span>HOURS</span><b>Mon–Sat · 10:00–18:00</b>
+            <span>EMAIL SUPPORT</span><b><a href="mailto:Noviscollection@gmail.com">Noviscollection@gmail.com</a></b>
+            <span>STORE TYPE</span><b>Online store · Shop from anywhere</b>
+            <span>SUPPORT FOR</span><b>Orders, product details, returns and general enquiries</b>
           </div>
+          <p className="contact-note">NOVIS operates online and does not have a walk-in retail location. Please contact us by email or use the form and our team will get back to you.</p>
         </div>
         <form className="lux-form" onSubmit={submit}>
           <label>NAME<input required minLength={2} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></label>
@@ -360,7 +363,7 @@ function Storefront() {
           <Route path="/product/:slug" element={<ProductPage products={products} onAdd={add} />} />
           <Route path="/collection/:kind" element={<CollectionRoute common={common} />} />
           <Route path="/journal" element={<Journal />} />
-          <Route path="/about" element={<StaticPage title="The NOVIS Story" eyebrow="ABOUT NOVIS"><Story /></StaticPage>} />
+          <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact token={token} />} />
           <Route path="/notifications" element={<Notifications token={token} />} />
           <Route path="/login" element={<Login onLogin={handleLogin} user={user} mode="login" />} />
