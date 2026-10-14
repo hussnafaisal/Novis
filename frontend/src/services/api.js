@@ -1,4 +1,4 @@
-import { products as starterProducts } from '../data/products';
+import { products as starterProducts } from '../data/products.js';
 
 const KEYS = {
   products: 'novis-local-products',
@@ -249,6 +249,35 @@ export async function api(path, { method = 'GET', body, token } = {}) {
     });
     return { customers };
   }
+  const customerMatch = path.match(/^\/admin\/customers\/([^/]+)$/);
+  if (customerMatch && (verb === 'PATCH' || verb === 'PUT')) {
+    if (user?.role !== 'ADMIN') fail('Admin access required.');
+    const customerId = decodeURIComponent(customerMatch[1]);
+    const users = list(KEYS.users);
+    const target = users.find((entry) => String(entry.id) === customerId && entry.role !== 'ADMIN');
+    if (!target) fail('Customer account was not found.');
+    const name = body?.name === undefined ? target.name : String(body.name).trim();
+    const email = body?.email === undefined ? target.email : String(body.email).trim().toLowerCase();
+    if (name.length < 2) fail('Customer name must be at least 2 characters.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fail('Enter a valid customer email address.');
+    if (users.some((entry) => entry.role !== 'ADMIN' && String(entry.id) !== customerId && String(entry.email || '').toLowerCase() === email)) {
+      fail('Another customer account already uses this email.');
+    }
+    const updatedUsers = users.map((entry) => String(entry.id) === customerId
+      ? { ...entry, name, email, profile: { ...(entry.profile || {}), name, email }, updatedAt: new Date().toISOString() }
+      : entry);
+    save(KEYS.users, updatedUsers);
+    const sessions = read('novis-local-sessions', {});
+    for (const [sessionToken, sessionUser] of Object.entries(sessions)) {
+      if (String(sessionUser?.id) === customerId) sessions[sessionToken] = { ...sessionUser, name, email };
+    }
+    save('novis-local-sessions', sessions);
+    const legacySession = read('novis-local-session', null);
+    if (String(legacySession?.user?.id) === customerId) {
+      save('novis-local-session', { ...legacySession, user: { ...legacySession.user, name, email } });
+    }
+    return { customer: { id: target.id, name, email, role: target.role, createdAt: target.createdAt }, message: 'Customer updated successfully.' };
+  }
   if (path === '/admin/contacts' && verb === 'GET') { if (user?.role !== 'ADMIN') fail('Admin access required.'); return { messages: list(KEYS.contacts) }; }
   const contactMatch = path.match(/^\/admin\/contacts\/([^/]+)$/);
   if (contactMatch && verb === 'PATCH') {
@@ -301,3 +330,5 @@ export const createProduct = (token, body) => api('/products', { method: 'POST',
 export const updateProduct = (token, id, body) => api(`/products/${id}`, { method: 'PUT', token, body });
 export const deleteProduct = (token, id) => api(`/products/${id}`, { method: 'DELETE', token });
 export const updateAdminOrder = (token, id, body) => api(`/admin/orders/${id}`, { method: 'PATCH', token, body });
+
+export const updateAdminCustomer = (token, id, body) => api(`/admin/customers/${encodeURIComponent(id)}`, { method: 'PATCH', token, body });

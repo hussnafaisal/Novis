@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BarChart3, ShoppingBag, Users, Watch, LogOut, Edit3, Trash2, MessageSquare, RefreshCw, X } from 'lucide-react';
-import { getAdminDashboard, getAdminOrders, getAdminCustomers, getAdminContacts, replyContact, createProduct, updateProduct, deleteProduct, logout, getProducts, updateAdminOrder } from '../services/api';
+import { getAdminDashboard, getAdminOrders, getAdminCustomers, getAdminContacts, replyContact, createProduct, updateProduct, deleteProduct, logout, getProducts, updateAdminOrder, updateAdminCustomer } from '../services/api';
 import '../lib/money.js';
 import { money } from '../lib/money.js';
 import './admin.css';
@@ -17,6 +17,9 @@ export default function AdminDashboard({ user, onLogout }) {
   const [dash, setDash] = useState(null);
   const [orders, setOrders] = useState([]);
   const [customers, setCustomers] = useState([]);
+  const [customerEditing, setCustomerEditing] = useState(null);
+  const [customerForm, setCustomerForm] = useState({ name: '', email: '' });
+  const [savingCustomer, setSavingCustomer] = useState(false);
   const [contacts, setContacts] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -160,6 +163,43 @@ export default function AdminDashboard({ user, onLogout }) {
     }
   };
 
+  const startCustomerEdit = (customer) => {
+    setCustomerEditing(customer.id);
+    setCustomerForm({
+      name: customer.name || customer.profile?.name || '',
+      email: customer.email || customer.profile?.email || '',
+    });
+    setError('');
+  };
+
+  const saveCustomer = async (event) => {
+    event.preventDefault();
+    if (!customerEditing) return;
+    if (customerForm.name.trim().length < 2) {
+      setError('Customer name must be at least 2 characters.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerForm.email.trim())) {
+      setError('Enter a valid customer email address.');
+      return;
+    }
+    try {
+      setSavingCustomer(true);
+      setError('');
+      await updateAdminCustomer(token, customerEditing, {
+        name: customerForm.name.trim(),
+        email: customerForm.email.trim().toLowerCase(),
+      });
+      setCustomerEditing(null);
+      setCustomerForm({ name: '', email: '' });
+      await load();
+    } catch (requestError) {
+      setError(friendly(requestError));
+    } finally {
+      setSavingCustomer(false);
+    }
+  };
+
   const handleLogout = async () => {
     const adminToken = localStorage.getItem('novis-admin-token');
     await logout(adminToken).catch(() => {});
@@ -240,7 +280,32 @@ export default function AdminDashboard({ user, onLogout }) {
         )}
 
         {tab === 'orders' && <OrderManagement orders={orders} onSave={saveOrder} />}
-        {tab === 'customers' && <section className="admin-panel"><div className="panel-head"><h2>Customers</h2></div><div className="admin-list">{customers.length ? customers.map((customer) => <div key={customer.id || customer.email}><b>{customer.name || customer.profile?.name || 'Customer'}</b><span>{customer.email || customer.profile?.email || 'No email'}</span><small>{Number(customer.orderCount ?? customer._count?.orders ?? customer.orders?.length ?? 0)} orders · {money(customer.totalSpent || 0)} spent</small></div>) : <p className="admin-empty">No customer accounts yet. Customers will appear here after registering on the storefront.</p>}</div></section>}
+        {tab === 'customers' && (
+          <section className="admin-panel">
+            <div className="panel-head"><h2>Customers</h2><span>{customers.length} accounts</span></div>
+            {customerEditing && (
+              <form className="customer-edit-form" onSubmit={saveCustomer}>
+                <h3>Update customer</h3>
+                <label>FULL NAME<input value={customerForm.name} onChange={(event) => setCustomerForm({ ...customerForm, name: event.target.value })} required minLength={2} /></label>
+                <label>EMAIL ADDRESS<input type="email" value={customerForm.email} onChange={(event) => setCustomerForm({ ...customerForm, email: event.target.value })} required /></label>
+                <div className="customer-edit-actions">
+                  <button className="gold-btn" type="submit" disabled={savingCustomer}>{savingCustomer ? 'SAVING…' : 'SAVE CUSTOMER'}</button>
+                  <button className="text-btn" type="button" onClick={() => { setCustomerEditing(null); setCustomerForm({ name: '', email: '' }); }}>CANCEL</button>
+                </div>
+              </form>
+            )}
+            <div className="admin-list">
+              {customers.length ? customers.map((customer) => (
+                <div key={customer.id || customer.email}>
+                  <b>{customer.name || customer.profile?.name || 'Customer'}</b>
+                  <span>{customer.email || customer.profile?.email || 'No email'}</span>
+                  <small>{Number(customer.orderCount ?? customer._count?.orders ?? customer.orders?.length ?? 0)} orders · {money(customer.totalSpent || 0)} spent</small>
+                  <button className="text-btn" type="button" onClick={() => startCustomerEdit(customer)}>EDIT CUSTOMER</button>
+                </div>
+              )) : <p className="admin-empty">No customer accounts yet. Customers will appear here after registering on the storefront.</p>}
+            </div>
+          </section>
+        )}
 
         {tab === 'messages' && (
           <section className="admin-panel">

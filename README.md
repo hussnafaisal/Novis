@@ -1,49 +1,31 @@
-# NOVIS — Luxury Watch Full-Stack Project
+# NOVIS — Frontend-only luxury watch store
 
-This package is the cleaned NOVIS project based on the current project structure and the requested luxury-watch specification.
+This version runs without a backend server. Storefront accounts, products, carts, orders, contact messages, and admin edits are stored in the browser's local storage on the current device/browser.
 
-## What was fixed
+## Run locally on Windows
 
-- Removed invalid `Facebook` / `Instagram` imports from `lucide-react`.
-- Added working inline social SVG icons in the footer.
-- Kept `Link` correctly imported from `react-router-dom`.
-- Replaced the fragile PostgreSQL-only local setup with SQLite for local development, so a local PostgreSQL server is not required just to start NOVIS.
-- Added a local `server/.env` with a SQLite `DATABASE_URL`.
-- Added `npm run setup` to generate Prisma, create/update the SQLite database, and seed products/admin.
-- Preserved the frontend routes, storefront, cart, auth/reset-password flow, and private admin route.
-
-## Windows quick start
-
-1. Extract this ZIP.
-2. Open PowerShell in the extracted folder.
+1. Extract the ZIP.
+2. Open PowerShell in the project folder.
 3. Run:
 
 ```powershell
 npm install
-npm run setup
 npm run dev
 ```
 
 Or double-click `RUN-NOVIS.bat`.
 
-## URLs
+- Storefront: `http://localhost:5173/`
+- Admin panel: `http://localhost:5173/admin`
 
-- Storefront: http://localhost:5173/
-- Admin: http://localhost:5173/admin
-- API health: http://localhost:4000/api/health
+## Netlify deployment
 
-## Admin
+The root `netlify.toml` is configured for this repository layout:
+- Build command: `npm run build`
+- Publish directory: `frontend/dist`
 
-Email: `admin@novis.local`
+If the Netlify UI has custom build settings overriding the file, clear the conflicting override or set the publish directory to `frontend/dist` with the repository root as the base directory.
 
-Password: `muttahir123@`
+## Important limitations
 
-Change this password before production use.
-
-## Password reset
-
-The reset flow does not require the old password. It creates a short-lived reset token and allows the user to set a new password. If SMTP is not configured, the development server prints the reset URL in the server console. Configure SMTP variables in `server/.env` for real email delivery.
-
-## Important
-
-The ZIP intentionally does not contain `node_modules`. Run `npm install` after extraction.
+This is a frontend-only demo. Local storage is not a shared database and does not sync customer/order data between devices or browsers. Do not use real customer passwords or sensitive personal data in this demo. Real production authentication and secure cross-device persistence require a backend or managed database/auth service.
